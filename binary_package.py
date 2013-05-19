@@ -10,6 +10,7 @@ extra_repos = """deb http://repo.mnorp.com %s main
 deb http://archive.ubuntu.com/ubuntu precise-updates main universe
 deb http://archive.ubuntu.com/ubuntu precise main universe"""
 
+
 def run_command_status(*argv, **env):
     print datetime.datetime.now(), "Running:", " ".join(argv)
     if len(argv) == 1:
@@ -22,7 +23,7 @@ def run_command_status(*argv, **env):
     return (p.returncode, out)
 
 
-def main():
+def main(run_reprepro=False):
     global extra_repos
     dsc_file = sys.argv[1]
     changes_file = dsc_file.replace('.dsc', '_source.changes')
@@ -46,7 +47,10 @@ def main():
         "--basetgz", basetgz, dsc_file,
         DEB_BUILD_OPTIONS='nocheck')
 
-    #reprepro --ignore=wrongdistribution -Vb /var/www include $branch output/*changes
+    if run_reprepro:
+        run_command_status(
+            "reprepro", "--ignore=wrongdistribution", "-Vb",
+            "/var/www", "include", repo, 'output/*changes')
 
 if __name__ == '__main__':
     main()
