@@ -30,11 +30,11 @@ def main(run_reprepro=False):
     changes = deb822.Changes(open(changes_file, 'r'))
     distro = changes.get('Distribution')
     repo = distro.replace('-', '/')
-    basetgz = "/root/%s.tgz" % distro
+    basetgz = os.path.expanduser("~/%s.tgz" % distro)
 
     if not os.path.exists(basetgz):
         run_command_status(
-            "pbuilder", "--create", "--basetgz", basetgz,
+            "sudo", "pbuilder", "--create", "--basetgz", basetgz,
             "--othermirror",
             extra_repos % repo,
             "--override-config")
@@ -42,7 +42,7 @@ def main(run_reprepro=False):
     os.mkdir('output')
 
     run_command_status(
-        "pbuilder", "--build", "--allow-untrusted",
+        "sudo", "pbuilder", "--build", "--allow-untrusted",
         "--buildresult", os.path.abspath('output'),
         "--basetgz", basetgz, dsc_file,
         DEB_BUILD_OPTIONS='nocheck')
